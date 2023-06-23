@@ -10,7 +10,7 @@ import sys
 
 sys.path.append(os.path.join(sys.path[0], 'src'))
 
-from src.config import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASS
+from src.config import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASS, SECRET_AUTH
 from src.users.models import metadata as users_metadata
 from src.posts.models import metadata as posts_metadata
 # this is the Alembic Config object, which provides
@@ -23,6 +23,8 @@ config.set_section_option(section, "DB_PORT", DB_PORT)
 config.set_section_option(section, "DB_USER", DB_USER)
 config.set_section_option(section, "DB_NAME", DB_NAME)
 config.set_section_option(section, "DB_PASS", DB_PASS)
+
+config.set_section_option(section, "SECRET_AUTH", SECRET_AUTH)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

@@ -1,8 +1,7 @@
-import uuid
 from typing import Optional
-
+import jwt
 from fastapi import Depends, Request
-from fastapi_users import BaseUserManager, UUIDIDMixin, schemas, models, exceptions, jwt
+from fastapi_users import BaseUserManager, schemas, models, exceptions, IntegerIDMixin
 from fastapi_users.jwt import generate_jwt, decode_jwt
 
 from src.config import SECRET_AUTH as SECRET
@@ -10,7 +9,7 @@ from src.users.models import User
 from src.users.utils import get_user_db
 
 
-class UserManager(UUIDIDMixin, BaseUserManager[User, int]):
+class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
@@ -66,37 +65,6 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, int]):
             self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
-    async def request_verify(
-        self, user: models.UP, request: Optional[Request] = None
-    ) -> None:
-        """
-        Start a verification request.
-
-        Triggers the on_after_request_verify handler on success.
-
-        :param user: The user to verify.
-        :param request: Optional FastAPI request that
-        triggered the operation, defaults to None.
-        :raises UserInactive: The user is inactive.
-        :raises UserAlreadyVerified: The user is already verified.
-        """
-        if not user.is_active:
-            raise exceptions.UserInactive()
-        if user.is_verified:
-            raise exceptions.UserAlreadyVerified()
-
-        token_data = {
-            "sub": str(user.id),
-            "email": user.email,
-            "aud": self.verification_token_audience,
-        }
-        token = generate_jwt(
-            token_data,
-            self.verification_token_secret,
-            self.verification_token_lifetime_seconds,
-        )
-        await self.on_after_request_verify(user, token, request)
-
     async def verify(self, token: str, request: Optional[Request] = None) -> models.UP:
         """
         Validate a verification request.
@@ -148,6 +116,36 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, int]):
         await self.on_after_verify(verified_user, request)
 
         return verified_user
+    async def request_verify(
+        self, user: models.UP, request: Optional[Request] = None
+    ) -> None:
+        """
+        Start a verification request.
+
+        Triggers the on_after_request_verify handler on success.
+
+        :param user: The user to verify.
+        :param request: Optional FastAPI request that
+        triggered the operation, defaults to None.
+        :raises UserInactive: The user is inactive.
+        :raises UserAlreadyVerified: The user is already verified.
+        """
+        if not user.is_active:
+            raise exceptions.UserInactive()
+        if user.is_verified:
+            raise exceptions.UserAlreadyVerified()
+
+        token_data = {
+            "sub": str(user.id),
+            "email": user.email,
+            "aud": self.verification_token_audience,
+        }
+        token = generate_jwt(
+            token_data,
+            self.verification_token_secret,
+            self.verification_token_lifetime_seconds,
+        )
+        await self.on_after_request_verify(user, token, request)
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):
