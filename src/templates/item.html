@@ -1,166 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Items</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-        }
+{% extends "base.html" %}
 
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ccc;
-        }
-
-        th {
-            background-color: #f9f9f9;
-            font-weight: bold;
-        }
-
-        .completed {
-            color: green;
-            font-weight: bold;
-        }
-
-        .not-completed {
-            color: red;
-            font-weight: bold;
-        }
-
-        button {
-            padding: 5px 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-    </style>
-</head>
-<body>
-<h1>Завдання</h1>
-
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Is Completed</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for item in items %}
-    <tr id="item-{{ item.id }}" class="{% if item.is_completed %}completed{% else %}not-completed{% endif %}">
-        <td class="id">{{ item.id }}</td>
-        <td class="title">{{ item.title }}</td>
-        <td>
-            {% if item.is_completed %}
-            <span class="completed">Завершено</span>
-            {% else %}
-            <span class="not-completed">Не завершено</span>
-            {% endif %}
-        </td>
-        <td>
-            <button onclick="completeItem({{ item.id }}, this)">Завершити</button>
-            <button onclick="deleteItem({{ item.id }})">Видалити</button>
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-
-<form id="add-todo-form">
-    <input type="text" id="todo-title-input" placeholder="Введіть назву завдання" required>
-    <button type="button" onclick="addTodoItem()">Додати</button>
-</form>
-
+{% block head %}
 <script>
-function completeItem(itemId, button) {
-    // Відправити запит до сервера для оновлення статусу завдання
-    fetch(`/todo/items/${itemId}/complete`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            // Успішно оновлено статус завдання
-            var itemElement = document.getElementById("item-" + itemId);
-            var titleElement = itemElement.querySelector(".title");
-            var idElement = itemElement.querySelector(".id");
-
-            titleElement.classList.add("completed");
-            idElement.classList.add("completed");
-            button.classList.add("complete-button");
-
-            // Оновити статус завдання в DOM
-            var statusCell = itemElement.querySelector(".not-completed");
-            statusCell.textContent = "Завершено";
-            statusCell.classList.remove("not-completed");
-            statusCell.classList.add("completed");
-        })
-        .catch(error => {
-            // Помилка під час оновлення статусу завдання
-            console.error(error);
-        });
-}
-
-function deleteItem(itemId) {
-    // Відправити запит до сервера для видалення завдання
-    fetch(`/todo/items/${itemId}`, { method: 'DELETE' })
-        .then(response => response.json())
-        .then(data => {
-            // Успішно видалено завдання
-            var itemElement = document.getElementById("item-" + itemId);
-            itemElement.remove();
-        })
-        .catch(error => {
-            // Помилка під час видалення завдання
-            console.error(error);
-        });
-}
-
-function addTodoItem() {
-    var titleInput = document.getElementById("todo-title-input");
-    var title = titleInput.value.trim();
-
-    if (title !== "") {
-        fetch('/todo/items', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ title: title, is_completed: false })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Успішно додано завдання до бази даних
-            var newTodo = data;
-
-            createTodoItem(newTodo.id, newTodo.title, newTodo.is_completed);
-
-            titleInput.value = "";
-        })
-        .catch(error => {
-            // Помилка під час додавання завдання
-            console.error(error);
-        });
+    const searchForOperation = () => {
+        const searchInputValue = document.getElementById("item_id").value;
+        window.location.href = `/pages/item/${searchInputValue}`;
     }
-}
 </script>
-</body>
-</html>
+{% endblock %}
+
+{% block content %}
+<div class="flex justify-center flex-col items-center">
+    <div class="flex my-3 gap-5">
+        <input id="item_id" type="text" placeholder="ToDo" class="text-xl">
+        <button onclick="searchForOperation()" class="border-2 rounded-3xl bg-gray-300 p-3">Пошук</button>
+    </div>
+    <span>Інфо</span>
+{% for item in todos %}
+    <div class="flex rounded-3 border-2 p-3 mt-5">
+        <img width="150" src="{{ url_for('static', path='stocks_1.png') }}" alt="Стонкс" class="mr-5">
+        <div class="flex flex-col">
+            <span class="text-2xl font-bold">{{ item.title }}</span>
+            {% if item.is_completed %}
+                <span class="text-lg">Завершено</span>
+            {% else %}
+                <span class="text-lg">Не завершено</span>
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}
+</div>
+{% endblock %}
