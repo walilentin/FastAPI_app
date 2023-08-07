@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <style>
+        /* Inline CSS styles */
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .registration, .login {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Todo List</h1>
+
+        <!-- Button to Show Registration Section -->
+        <button onclick="showRegistration()">Register</button>
+
+        <!-- Button to Show Login Section -->
+        <button onclick="showLogin()">Login</button>
+
+        <!-- Registration Section -->
+        <div class="registration" id="registrationSection">
+            <h2>Registration</h2>
+            <input type="text" id="usernameInput" placeholder="Username">
+            <input type="password" id="passwordInput" placeholder="Password">
+            <button onclick="register()">Register</button>
+        </div>
+
+        <!-- Login Section -->
+        <div class="login" id="loginSection">
+            <h2>Login</h2>
+            <input type="text" id="loginUsernameInput" placeholder="Username">
+            <input type="password" id="loginPasswordInput" placeholder="Password">
+            <button onclick="login()">Login</button>
+        </div>
+
+        <!-- Button to Todo List Page -->
+        <button onclick="goToTodoPage()"  >Go to Todo List</button>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script>
+    const searchForOperation = () => {
+        const searchInputValue = document.getElementById("item_id").value;
+        window.location.href = `/pages/todo/${searchInputValue}`;
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="flex justify-center flex-col items-center">
+    <div class="flex my-3 gap-5">
+        <input id="item_id" type="text" placeholder="ToDo" class="text-xl">
+        <button onclick="searchForOperation()" class="border-2 rounded-3xl bg-gray-300 p-3">Пошук</button>
+    </div>
+    <span>Інфо</span>
+    {% if todos %}
+        {% for item in todos %}
+            <div class="flex rounded-3 border-2 p-3 mt-5">
+                <img width="150" src="{{ url_for('static', path='stocks_1.png') }}" alt="Стонкс" class="mr-5">
+                <div class="flex flex-col">
+                    <span class="text-2xl font-bold">{{ item.title }}</span>
+                    <span class="text-2xl font-bold">{{ item.author_id }}</span>
+                    {% if item.is_completed %}
+                        <span class="text-lg">Завершено</span>
+                    {% else %}
+                        <span class="text-lg">Не завершено</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+    <span class="text-lg">Завдання не знайдено</span>
+    {% endif %}
+</div>
+{% endblock %}

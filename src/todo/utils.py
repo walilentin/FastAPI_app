@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy import select, insert, delete, update
-from src.todo.models import ToDo
+from src.todo.models import ToDo, todo
 
 
 async def new_todo(session, create_todo):
@@ -10,11 +10,17 @@ async def new_todo(session, create_todo):
     return {"status": "success"}
 
 
-async def get_all(session):
+async def search_by_id(session, todo_id):
+    query = select(todo).where(todo.c.id == todo_id)
+    result = await session.execute(query)
+    return {"data": result.all()}
+
+
+
+async def all_todo(session):
     query = select(ToDo)
     result = await session.scalars(query)
     return result.all()
-
 
 
 async def complete_todo(session, todo_id):
